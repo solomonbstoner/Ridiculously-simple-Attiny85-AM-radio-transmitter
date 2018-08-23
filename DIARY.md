@@ -28,14 +28,54 @@ http://maxembedded.com/2015/06/setting-up-avr-gcc-toolchain-on-linux-and-mac-os-
 
 ### Preparing the hardware
 
-**TODO**
+Scott W Harden came up with the schematic for an AVR AM radio transmitter. 
+
+![](https://swharden.com/wp/images/schem.jpg)
+
+**TODO: include quotes and explanations from Harden's website**
+
+As there is little difference between the Attiny85 and Attiny44A, there is almost no change to the schematic in our radio transmitter.
+
+![](pics_and_videos/attiny85_am_transmitter_schematic.png)
+
+The only difference is the pin number for the different functions.
+
+| Pin func | Attiny44A pin no. | Attiny85 pin no. |
+|---|---|---|
+| Vcc | 1 | 8 |
+| Gnd | 4 | 4 |
+| CLKO | 5 | 3 |
+
+The "audio" pin is simply a GPIO pin that we set high or low. It does not matter which pin we use as the audio pin. I chose pin 2 (ie PB3) on the Attiny85 as it is beside the CLKO pin.
+
+![](pics_and_videos/attiny85_datasheet_sec1_pg2_pin_config.png)
+
 
 ### Programming the Attiny85
 
-**TODO**
+Our Attiny85, like Harden's Attiny44A, serves two purposes:
+1. Generate the carrier wave (1MHz in this example)
+2. To generate the morse code
 
-This explains the `#define F_CPU   1000000UL` in [test.c](test.c). I thought it was the clock speed!! So what determined the clock speed???
+##### Generating and outputting the 1MHz wave
 
+Assuming that you've never changed the [fuse bytes] on your Attiny85 before, you need not do anything as the system clock is 1MHz by default.
+
+> The device is shipped with CKSEL = “0010”, SUT = “10”, and CKDIV8 programmed. The default clock source setting is therefore the Internal RC Oscillator running at 8 MHz with longest start-up time and an initial system clock prescaling of 8, resulting in 1.0 MHz system clock.
+>  
+> *-- Attiny85 datasheet section 6.2.7  - Default Clock Source*
+	
+To output the 1MHz wave to a pin, we need to program the CKOUT bit in the fuse low byte. We do so by adding the flag `-U lfuse:w:0b00100010:m` to the `avrdude` when we flash the hex. I'll go through that one in more detail later.
+
+![](pics_and_videos/attiny85_datasheet_sec20.2_pg149_fuse_bytes.png) 
+
+
+I programmed the CKOUT bit and tested the output using a cheap (and therefore possibly unreliable) oscilloscope. It registers a wave. I do not know why it states that the period of the wave is 25 microseconds (thereby implying that the frequency is 40kHz). The main point of doing the testing was to make sure that the pin gave a wave as an output, and it did. 
+
+![](pics_and_videos/attiny85_osc_output_from_clko_pin_1mhz.png)
+
+
+Our Attiny85 would send morse code by setting a GPIO pin high and low for a certain period of time. For instance, to send a `.`, it would send a GPIO high for say 10ms. To send a `_`, it would send a GPIO high for say 50ms. That requires the use of AVR Libc's function [`_delay_ms`](https://www.microchip.com/webdoc/AVRLibcReferenceManual/group__util__delay_1gad22e7a36b80e2f917324dc43a425e9d3.html). It, in turn requires us to define the `F_CPU` macro. 
 
 > #define F_CPU   1000000UL
 >  
@@ -44,6 +84,8 @@ This explains the `#define F_CPU   1000000UL` in [test.c](test.c). I thought it 
 > The macro F_CPU specifies the CPU frequency to be considered by the delay macros. This macro is normally supplied by the environment (e.g. from within a project header, or the project's Makefile). The value 1 MHz here is only provided as a "vanilla" fallback if no such user-provided definition could be found.
 >  
 > *--[AVR-libc util/delay.h](https://www.nongnu.org/avr-libc/user-manual/group__util__delay.html)*
+
+**TODO**
 
 This explains the `PORTB` in the line of code `PORTB|=_BV(3);_delay_ms(1);`.
 
