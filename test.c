@@ -1,4 +1,4 @@
-// designed for and tested with ATTiny44A
+// designed for and tested with ATTiny85
 #include <avr/io.h>
 #define F_CPU 1000000UL
 #include <avr/delay.h>
