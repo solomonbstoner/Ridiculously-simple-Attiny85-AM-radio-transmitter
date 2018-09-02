@@ -146,7 +146,7 @@ We will be flashing the Attiny85 using an Arduino Uno as the ISP. Set it up as s
 
 You may even choose to make a shield for the Attiny85. I did that.
 
-![](attiny85_programmer_homemade_shield_for_arduino_uno.jpg)
+![](pics_and_videos/attiny85_programmer_homemade_shield_for_arduino_uno.jpg)
 
 In order to compile the C code, make sure you have the avr-gcc-toolchain installed by following the guide in [this website](http://maxembedded.com/2015/06/setting-up-avr-gcc-toolchain-on-linux-and-mac-os-x/).
 
@@ -222,4 +222,4 @@ avrdude done.  Thank you.
 ➜  am_radio
 ```
 
-Power up your AM transmitter and a AM receiver, and start receiving your broadcast at a very limited range. The range of my transmitter was less than 1 metre. Here's [a video](working_attiny85_radio_video.mp4) of my AM transmitter .
+Power up your AM transmitter and a AM receiver, and start receiving your broadcast at a very limited range. The range of my transmitter was less than 1 metre. Here's [a video](pics_and_videos/working_attiny85_radio_video.mp4) of my AM transmitter .
